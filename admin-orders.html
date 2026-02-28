@@ -1,0 +1,90 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Admin Orders - Loyal Fashion</title>
+
+<style>
+body{font-family:Segoe UI;background:#f4f6f9;margin:0}
+.header{background:#000;color:#fff;padding:15px 30px;display:flex;justify-content:space-between}
+.order-container{padding:30px}
+.order-card{
+background:#fff;
+padding:15px;
+margin-bottom:15px;
+border-radius:8px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+.order-img{
+width:80px;
+height:80px;
+object-fit:cover;
+border-radius:6px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+<h2>📦 Admin Orders</h2>
+<button onclick="window.location.href='admin.html'">Back</button>
+</div>
+
+<div class="order-container" id="orderList"></div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
+<script>
+const firebaseConfig={
+apiKey:"AIzaSyCax6078YpxQU0kHIChQLuEmpLUYXSxQr4",
+authDomain:"e-commerce-wepsite.firebaseapp.com",
+projectId:"e-commerce-wepsite",
+storageBucket:"e-commerce-wepsite.appspot.com",
+messagingSenderId:"394408704286",
+appId:"1:394408704286:web:9ad690a946b225ab20f10f"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db=firebase.firestore();
+
+const list=document.getElementById("orderList");
+
+db.collection("orders")
+.orderBy("createdAt","desc")
+.onSnapshot(snapshot=>{
+
+list.innerHTML="";
+
+if(snapshot.empty){
+list.innerHTML="<h3>No Orders Found</h3>";
+return;
+}
+
+snapshot.forEach(doc=>{
+const data=doc.data();
+
+list.innerHTML+=`
+<div class="order-card">
+<div style="display:flex;gap:15px;align-items:center;">
+<img src="${data.image || 'https://via.placeholder.com/80'}" class="order-img">
+<div>
+<b>${data.productName}</b><br>
+₹${data.price}<br>
+👤 ${data.user}
+</div>
+</div>
+</div>
+`;
+});
+});
+</script>
+
+</body>
+</html>
