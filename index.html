@@ -1,0 +1,96 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Login - UTRA FASHION </title>
+<style>
+body{background:#f2f4f8;font-family:'Segoe UI',sans-serif;display:flex;justify-content:center;align-items:center;height:100vh;margin:0;}
+.card{background:white;padding:35px;border-radius:15px;box-shadow:0 15px 30px rgba(0,0,0,0.1);width:350px;text-align:center;}
+.logo{width:70px;height:70px;border-radius:50%;margin-bottom:10px;}
+h2{margin:10px 0 20px 0;}
+input{width:100%;padding:12px;margin:10px 0;border-radius:8px;border:1px solid #ddd;outline:none;}
+.password-wrapper{position:relative;}
+.show-btn{position:absolute;right:10px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:13px;color:#007bff;}
+button{width:100%;padding:12px;background:black;color:white;border:none;border-radius:8px;font-weight:bold;cursor:pointer;margin-top:15px;}
+button:hover{opacity:0.9;}
+#status{color:red;font-size:14px;margin-top:10px;}
+</style>
+</head>
+<body>
+
+<div class="card">
+<img src="image.png" class="logo" alt="Logo">
+<h2>LOYAL FASHION</h2>
+<p style="color:#777;font-size:14px;">Admin Panel Login</p>
+
+<input type="email" id="email" placeholder="Admin Email">
+<div class="password-wrapper">
+<input type="password" id="password" placeholder="Password">
+<span class="show-btn" onclick="togglePassword()">Show</span>
+</div>
+
+<button onclick="login()">Login</button>
+<p id="status"></p>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCax6078YpxQU0kHIChQLuEmpLUYXSxQr4",
+  authDomain: "e-commerce-wepsite.firebaseapp.com",
+  projectId: "e-commerce-wepsite",
+  storageBucket: "e-commerce-wepsite.appspot.com",
+  messagingSenderId: "394408704286",
+  appId: "1:394408704286:web:9ad690a946b225ab20f10f"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+// Login function
+window.login = async function(){
+    const email = document.getElementById("email").value.trim().toLowerCase();
+    const pass = document.getElementById("password").value;
+    const status = document.getElementById("status");
+
+    if(!email || !pass){ status.innerText="Fill all fields ❌"; return; }
+
+    try{
+        const userCredential = await signInWithEmailAndPassword(auth, email, pass);
+        const user = userCredential.user;
+
+        // Admin email check
+        if(user.email === "sureshrajagunam24@gmail.com"){
+            localStorage.setItem("isAdminLoggedIn", "true"); // Session flag
+            alert("Welcome Admin! ✅");
+            window.location.href="admin-dashboard.html";
+        } else {
+            // Oruవేళ buyer email vachu inga login panna try panna block pannanum
+            await auth.signOut();
+            status.innerText="Access Denied: Not an Admin 🚫";
+        }
+    }catch(err){
+        console.error("Login Error:", err.code);
+        if(err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password'){
+            status.innerText="Invalid Email or Password ❌";
+        } else {
+            status.innerText="Login Error ❌";
+        }
+    }
+}
+
+// Password toggle function
+window.togglePassword = function(){
+    const pass=document.getElementById("password");
+    const btn=document.querySelector(".show-btn");
+    if(pass.type==="password"){ pass.type="text"; btn.innerText="Hide"; }
+    else{ pass.type="password"; btn.innerText="Show"; }
+}
+</script>
+
+</body>
+</html>
